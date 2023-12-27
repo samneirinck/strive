@@ -1,0 +1,44 @@
+package views
+
+templ Index() {
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <title>Strive - Your Personal Activity Tracker</title>
+    </head>
+    <body>
+      <header>
+        <nav>
+         <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/activities">Activities</a></li>
+         </ul>
+        </nav>
+      </header>
+      <main>
+        <section id="welcome">
+          <h1>Welcome to Strive</h1>
+          <p>Your personal space for tracking sports activities.</p>
+        </section>
+        <section id="recent-activities">
+          <h2>Recent Activities</h2>
+            <div class="activity-feed">
+                <!-- This is where your activity summaries will go -->
+                <!-- Example of an activity summary -->
+                <div class="activity">
+                    <img src="path/to/activity-thumbnail.jpg" alt="Activity Thumbnail" />
+                    <div class="activity-info">
+                        <h3>Evening Run</h3>
+                        <p>Distance: 5km</p>
+                        <p>Time: 30min</p>
+                        <p>Pace: 6min/km</p>
+                    </div>
+                </div>
+                <!-- Repeat for other activities -->
+            </div>
+        </section>
+      </main>
+    </body>
+  </html>
+}
