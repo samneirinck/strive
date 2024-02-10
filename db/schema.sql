@@ -1,0 +1,3 @@
+CREATE TABLE activities (
+	id	INTEGER PRIMARY KEY
+)
