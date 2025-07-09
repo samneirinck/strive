@@ -1,0 +1,10 @@
+[project]
+name = "garmin"
+version = "0.1.0"
+description = "Server to fetch garmin data"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.116.0",
+    "garth>=0.5.17",
+]
