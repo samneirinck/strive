@@ -51,6 +51,21 @@ def get_activity(activity_id: str):
     return activity
 
 
+@app.get(
+    "/v1/activities/{activity_id}/polyline", dependencies=[Depends(verify_api_key)]
+)
+def get_activity_polyline(activity_id: str):
+    polyline = garth.client.connectapi(
+        f"activity-service/activity/{activity_id}/polyline/full-resolution"
+    )
+    if not polyline:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activity polyline not found",
+        )
+    return polyline
+
+
 @app.get("/v1/user/profile", dependencies=[Depends(verify_api_key)])
 def get_user_profile():
     return garth.client.connectapi("/userprofile-service/socialProfile")
