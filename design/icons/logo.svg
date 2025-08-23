@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title>Strive app icon</title>
+  <desc>Shield-shaped outline with a stylized runner in motion and a GPS pin, designed as a simple, scalable app icon.</desc>
+  <defs>
+    <style>
+      .accent { color: #FF6A00; }
+    </style>
+    <clipPath id="shieldClip">
+      <!-- Same shape as the shield stroke, but slightly inset to keep strokes inside -->
+      <path d="M128 20
+               C 77 20, 44 50, 44 92
+               V132
+               C 44 194, 102 233, 128 244
+               C 154 233, 212 194, 212 132
+               V92
+               C 212 50, 179 20, 128 20 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Shield outline -->
+  <path class="accent" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"
+        d="M128 20
+           C 77 20, 44 50, 44 92
+           V132
+           C 44 194, 102 233, 128 244
+           C 154 233, 212 194, 212 132
+           V92
+           C 212 50, 179 20, 128 20 Z"/>
+
+  <!-- Contents clipped to shield for a clean icon silhouette -->
+  <g class="accent" clip-path="url(#shieldClip)">
+    <!-- GPS pin (behind runner) -->
+    <g opacity="0.9" transform="translate(0,10)">
+      <path fill="currentColor"
+            d="M128 192
+               c-16 0-30-13-30-30
+               s14-30 30-30
+               s30 13 30 30
+               s-14 30-30 30
+               Z
+               m0-44a14 14 0 1 0 0 28a14 14 0 1 0 0-28Z"/>
+      <!-- pin tail -->
+      <path fill="currentColor"
+            d="M128 226
+               c-2 0-20-28-20-28h40s-18 28-20 28Z"/>
+    </g>
+
+    <!-- Stylized runner made of strokes -->
+    <g fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Head -->
+      <circle cx="154" cy="64" r="12" fill="currentColor"/>
+      <!-- Torso / hip -->
+      <path d="M148 78 L136 108 L112 120"/>
+      <!-- Front arm -->
+      <path d="M136 92 L156 82"/>
+      <!-- Back arm -->
+      <path d="M140 96 L128 84"/>
+      <!-- Front leg -->
+      <path d="M112 120 L92 152 L78 188"/>
+      <!-- Back leg -->
+      <path d="M132 120 L156 148 L178 148"/>
+    </g>
+  </g>
+</svg>
