@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Strive</title>
+    <link rel="stylesheet" href="style.css">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.css' rel='stylesheet'>
+  </head>
+  <body>
+    <div class="container">
+      <aside class="sidebar">
+        <h1 class="logo">Strive</h1>
+        <nav class="nav">
+          <a href="#" class="nav-item">
+            <img src="icons/home.svg" alt="Home" class="nav-icon">
+            <span>Home</span>
+          </a>
+          <a class="active nav-item" href="#">
+            <img src="icons/workouts.svg" alt="Workouts" class="nav-icon">
+            <span>Workouts</span>
+          </a>
+          <a href="#" class="nav-item">
+            <img src="icons/training.svg" alt="Training" class="nav-icon">
+            <span>Training</span>
+          </a>
+          <a href="#" class="nav-item">
+            <img src="icons/analysis.svg" alt="Analysis" class="nav-icon">
+            <span>Analysis</span>
+          </a>
+        </nav>
+      </aside>
+      <main class="main-content">
+        <div class="top-bar">
+          <h2>Marathon run</h2>
+        </div>
+        <div id='map' style='width: 800px; height: 800px;'></div>
+        <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+        <script>
+          mapboxgl.accessToken = 'pk.eyJ1Ijoic2FtbmVpcmluY2siLCJhIjoiY21jNWFocGxwMGlodzJqc2FzM2l2dGo4ciJ9.w-joDzMme7SKCGbI-IA66g';
+          (async () => {
+const map = new mapboxgl.Map({
+	container: 'map', // container ID
+center: [3.46387,50.93277],
+	zoom: 12, // starting zoom
+});
+          
+        // Start downloading the route data, and wait for map load to occur in parallel
+        const [pinRouteGeojson] = await Promise.all([
+            fetch(
+                'half.geojson'
+            ).then((response) => response.json()),
+            map.once('style.load')
+        ]);
+
+        // Add terrain source, with slight exaggeration
+        map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.terrain-rgb',
+            'tileSize': 512,
+            'maxzoom': 14
+        });
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+
+        const pinRoute = pinRouteGeojson.features[0].geometry.coordinates;
+                    // Create a 'LngLatBounds' with both corners at the first coordinate.
+            const bounds = new mapboxgl.LngLatBounds(
+                pinRoute[0],
+                pinRoute[0]
+            );
+        
+            // Extend the 'LngLatBounds' to include every coordinate in the bounds result.
+            for (const coord of pinRoute) {
+                bounds.extend(coord);
+            }
+
+            map.fitBounds(bounds, {
+                padding: 20,
+              pitch: 45
+            });
+        // Create the marker and popup that will display the elevation queries
+        const marker = new mapboxgl.Marker({
+            color: 'red',
+            scale: 0.8,
+            draggable: false,
+            pitchAlignment: 'auto',
+            rotationAlignment: 'auto'
+        })
+            .setLngLat(pinRoute[0])
+            .addTo(map)
+
+            const starter = new mapboxgl.Marker({
+              color: 'green',
+              scale: 0.8,
+              draggable: false,
+              pitchAlignment: 'auto',
+              rotationAlignment: 'auto'
+            })
+            .setLngLat(pinRoute[0])
+            .addTo(map)
+
+        // Add a line feature and layer. This feature will get updated as we progress the animation
+        map.addSource('line', {
+            type: 'geojson',
+            // Line metrics is required to use the 'line-progress' property
+            lineMetrics: true,
+            data: pinRouteGeojson
+        });
+        map.addLayer({
+            type: 'line',
+            source: 'line',
+            id: 'line',
+            paint: {
+                'line-color': 'rgba(0,0,0,0)',
+                'line-width': 5
+            },
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round'
+            }
+        });
+
+        await map.once('idle');
+        // The total animation duration, in milliseconds
+        const animationDuration = 10000;
+        // Use the https://turfjs.org/ library to calculate line distances and
+        // sample the line at a given percentage with the turf.along function.
+        const path = turf.lineString(pinRoute);
+        // Get the total line distance
+        const pathDistance = turf.lineDistance(path);
+        let start;
+        function frame(time) {
+            if (!start) start = time;
+            const animationPhase = (time - start) / animationDuration;
+            if (animationPhase > 1) {
+                return;
+            }
+
+            // Get the new latitude and longitude by sampling along the path
+            const alongPath = turf.along(path, pathDistance * animationPhase)
+                .geometry.coordinates;
+            const lngLat = {
+                lng: alongPath[0],
+                lat: alongPath[1]
+            };
+
+            // Sample the terrain elevation. We round to an integer value to
+            // prevent showing a lot of digits during the animation
+            const elevation = Math.floor(
+                // Do not use terrain exaggeration to get actual meter values
+                map.queryTerrainElevation(lngLat, { exaggerated: false })
+            );
+
+            // Update the popup altitude value and marker location
+            marker.setLngLat(lngLat);
+
+            // Reduce the visible length of the line by using a line-gradient to cutoff the line
+            // animationPhase is a value between 0 and 1 that reprents the progress of the animation
+            map.setPaintProperty('line', 'line-gradient', [
+                'step',
+                ['line-progress'],
+                'red',
+                animationPhase,
+                'rgba(255, 0, 0, 0)'
+            ]);
+
+            window.requestAnimationFrame(frame);
+        }
+
+        window.requestAnimationFrame(frame);
+        })();
+        </script>
+      </main>
+    </div>
+  </body>
+</html>
